@@ -1,19 +1,22 @@
-# Ello.EventStream
+<img src="http://d324imu86q1bqn.cloudfront.net/uploads/user/avatar/641/large_Ello.1000x1000.png" width="200px" height="200px" />
 
-**TODO: Add description**
+# Ello.EventStream (WIP)
 
-## Installation
+Library for reading and writing to the Ello event stream.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ello_event_stream` to your list of dependencies in `mix.exs`:
+Ello uses the AWS Kinesis service to publish events for multiple services to
+consume. Events are published as Apach Avro serialized OCF files.
 
-```elixir
-def deps do
-  [{:ello_event_stream, "~> 0.1.0"}]
-end
-```
+This library is a common library that can be used by our Elixir applications
+to both publish to and read from the event stream.
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/ello_event_stream](https://hexdocs.pm/ello_event_stream).
+## License
+Released under the [MIT License](/LICENSE.txt)
 
+## Code of Conduct
+Ello was created by idealists who believe that the essential nature of all
+human beings is to be kind, considerate, helpful, intelligent, responsible, and
+respectful of others. To that end, we will be enforcing
+[the Ello rules](https://ello.co/wtf/policies/rules/) within all of our open
+source projects. If you don’t follow the rules, you risk being ignored, banned,
+or reported for abuse.
