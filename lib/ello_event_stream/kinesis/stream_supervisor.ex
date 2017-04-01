@@ -25,7 +25,7 @@ defmodule Ello.EventStream.Kinesis.StreamSupervisor do
   end
 
   def init(:ok) do
-    children = [worker(Task, [])]
+    children = [worker(Task, [], restart: :transient)]
     supervise(children, strategy: :simple_one_for_one)
   end
 end

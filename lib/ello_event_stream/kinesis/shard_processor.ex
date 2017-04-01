@@ -1,4 +1,5 @@
 defmodule Ello.EventStream.Kinesis.ShardProcessor do
+  require Logger
   alias Ello.EventStream.{
     Kinesis,
   }
@@ -10,8 +11,9 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
       iterator:   nil,
       callback:   nil,
       limit:      100,
-      events:    [],
+      events:     [],
       last_fetch: nil,
+      exit:       false,
       last_sequence_number: nil,
     ]
   end
@@ -23,6 +25,11 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
       callback: callback,
       limit:    opts[:limit] || 100,
     })
+  end
+
+  def process(%State{exit: true, shard: shard}) do
+    Logger.info("Shard #{shard} has been closed, all records are processed")
+    Process.exit(self(), :normal)
   end
 
   def process(%State{} = state) do
@@ -42,7 +49,10 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
   defp get_last_sequence_number(state), do: state
 
   defp get_new_iterator(%{iterator: nil} = state) do
-    %{state | iterator: Kinesis.get_iterator(state.stream, state.shard, state.last_sequence_number)}
+    case Kinesis.get_iterator(state.stream, state.shard, state.last_sequence_number) do
+      nil   -> %{state | iterator: nil, exit: true}
+      other -> %{state | iterator: other}
+    end
   end
   defp get_new_iterator(state), do: state
 
@@ -55,18 +65,26 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
     %{state | last_fetch: System.system_time(:second)}
   end
 
+  defp get_events(%{exit: true} = state), do: state
   defp get_events(state) do
-    {events, next_iterator} = Kinesis.events(state.iterator, state.limit)
-    %{state | events: events, iterator: next_iterator}
+    case Kinesis.events(state.iterator, state.limit) do
+      {events, nil, _ms_behind} ->
+        %{state | events: events, iterator: nil, exit: true}
+      {events, next_iterator, ms_behind} ->
+        Logger.info "Got batch of #{length(events)} records, #{ms_behind}ms behind latest"
+        %{state | events: events, iterator: next_iterator}
+    end
   end
 
+  defp process_events(%{exit: true} = state), do: state
   defp process_events(%{events: []} = state), do: state
-  defp process_events(%{events: [next | rest]} = state) do
+  defp process_events(%{events: [event | rest]} = state) do
+    Logger.debug "Processing #{event.type} event ##{event.sequence_number}."
     {mod, fun} = state.callback
-    case apply(mod, fun, [next]) do
+    case apply(mod, fun, [event]) do
       :ok ->
         state
-        |> set_last_sequence_number(next)
+        |> set_last_sequence_number(event)
         |> Map.put(:events, rest)
         |> process_events
       _ -> raise "Processing failed"

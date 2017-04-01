@@ -5,7 +5,7 @@
   "gen_stage": {:hex, :gen_stage, "0.11.0", "943bdfa85c75fa624e0a36a9d135baad20a523be040178f5a215444b45c66ea4", [:mix], []},
   "hackney": {:hex, :hackney, "1.7.1", "e238c52c5df3c3b16ce613d3a51c7220a784d734879b1e231c9babd433ac1cb4", [:rebar3], [{:certifi, "1.0.0", [hex: :certifi, optional: false]}, {:idna, "4.0.0", [hex: :idna, optional: false]}, {:metrics, "1.0.1", [hex: :metrics, optional: false]}, {:mimerl, "1.0.2", [hex: :mimerl, optional: false]}, {:ssl_verify_fun, "1.1.1", [hex: :ssl_verify_fun, optional: false]}]},
   "idna": {:hex, :idna, "4.0.0", "10aaa9f79d0b12cf0def53038547855b91144f1bfcc0ec73494f38bb7b9c4961", [:rebar3], []},
-  "jsone": {:git, "https://github.com/sile/jsone.git", "e533179d651cc356556bbe5e4b7caddb0919d593", [tag: "1.4.3"]},
+  "jsone": {:git, "https://github.com/sile/jsone", "e533179d651cc356556bbe5e4b7caddb0919d593", [tag: "1.4.3"]},
   "jsx": {:git, "https://github.com/talentdeficit/jsx.git", "d011411c23e9f8c29d98aa1b7a50ddf9709b6a60", [tag: "v1.4.5"]},
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], []},
   "mimerl": {:hex, :mimerl, "1.0.2", "993f9b0e084083405ed8252b99460c4f0563e41729ab42d9074fd5e52439be88", [:rebar3], []},

@@ -1,6 +1,5 @@
 defmodule Ello.EventStream do
   alias __MODULE__.{
-    Event,
     Kinesis.StreamSupervisor
   }
 

@@ -34,8 +34,8 @@ defmodule Ello.EventStream.Kinesis do
   def events(iterator, limit, backoff \\ 1000) do
     req = client().get_records(iterator, limit: limit)
     case client_execute(req) do
-      {:ok, %{"Records" => records, "NextShardIterator" => next}} ->
-        {Enum.map(records, &Event.from_kinesis/1), next}
+      {:ok, %{"Records" => records, "NextShardIterator" => next, "MillisBehindLatest" => ms_behind}} ->
+        {Enum.map(records, &Event.from_kinesis/1), next, ms_behind}
       {:error, _} ->
         :timer.sleep(backoff)
         events(iterator, limit, backoff * 2)

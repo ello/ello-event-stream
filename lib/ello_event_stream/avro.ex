@@ -6,7 +6,7 @@ defmodule Ello.EventStream.Avro do
   def parse_ocf(binary) do
     {_header, schema, data} = :avro_ocf.decode_binary(binary)
     {:avro_record_type, type, _, _,  _, _definition, _type, _} = schema
-    {type, data}
+    {type, deep_into(data)}
   end
 
   # Convert lists of tuples into maps.
