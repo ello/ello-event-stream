@@ -10,6 +10,35 @@ consume. Events are published as Apach Avro serialized OCF files.
 This library is a common library that can be used by our Elixir applications
 to both publish to and read from the event stream.
 
+## Usage
+
+Add as a dependency (and ensure started if < Elixir 1.4):
+
+```elixir
+{:ello_event_stream, github: "ello/ello-event-stream"},
+```
+
+### Reading/Consuming an event stream
+
+By default no consumers are started. Starting the Reader will start a
+supervision tree for the given stream name in the `:ello_event_stream` app.
+
+Each shard will be processed serially and passed to the consumer function.
+
+The consumer function is passed in as a `{Module, :function}` tuple and must
+be a function which receives a single argument which is an
+`%Ello.EventStream.Event{}`. The consumer function should return `:ok` if
+the event was successfully processed or skipped, otherwise the shard will stop
+processing events.
+
+The consumer may choose to spawn more processes to handle each event if desired.
+
+```elixir
+Ello.EventStream.read("stream-name", {MyApp, :process}, opts)
+```
+
+
+
 ## License
 Released under the [MIT License](/LICENSE.txt)
 
