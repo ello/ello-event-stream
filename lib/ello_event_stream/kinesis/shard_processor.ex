@@ -49,7 +49,7 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
   defp get_last_sequence_number(state), do: state
 
   defp get_new_iterator(%{iterator: nil} = state) do
-    case Kinesis.get_iterator(state.stream, state.shard, state.last_sequence_number) do
+    case kinesis().get_iterator(state.stream, state.shard, state.last_sequence_number) do
       nil   -> %{state | iterator: nil, exit: true}
       other -> %{state | iterator: other}
     end
@@ -67,7 +67,9 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
 
   defp get_events(%{exit: true} = state), do: state
   defp get_events(state) do
-    case Kinesis.events(state.iterator, state.limit) do
+    case kinesis().events(state.iterator, state.limit) do
+      {:error, :iterator_expired} ->
+        %{state | events: [], interator: nil}
       {events, nil, _ms_behind} ->
         %{state | events: events, iterator: nil, exit: true}
       {events, next_iterator, ms_behind} ->
@@ -94,5 +96,9 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
   defp set_last_sequence_number(state, %{sequence_number: sequence_number}) do
     #TODO: Put in redis.
     %{state | last_sequence_number: sequence_number}
+  end
+
+  def kinesis do
+    Application.get_env(:ello_event_stream, :kinesis, Kinesis)
   end
 end

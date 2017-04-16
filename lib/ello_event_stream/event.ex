@@ -1,6 +1,6 @@
 defmodule Ello.EventStream.Event do
   alias Ello.EventStream.Avro
-  defstruct type: "", data: [], shard: nil, sequence_number: nil, raw: ""
+  defstruct type: "", data: nil, shard: nil, sequence_number: nil, raw: ""
 
   def from_kinesis(record) do
     parse_raw(%__MODULE__{
