@@ -1,18 +1,20 @@
 defmodule Ello.EventStream do
-  @moduledoc """
-  Documentation for Ello.EventStream.
-  """
+  alias __MODULE__.{
+    Kinesis.StreamSupervisor
+  }
 
-  @doc """
-  Hello world.
+  def read(stream, callback, opts \\ %{}) do
+    StreamSupervisor.start_stream(stream, callback, opts)
+  end
 
-  ## Examples
+  # Ello.EventStream.tmp
+  def tmp do
+    read("ello-staging-stream", {__MODULE__, :inspect})
+  end
 
-      iex> Ello.EventStream.hello
-      :world
-
-  """
-  def hello do
-    :world
+  def inspect(event) do
+    event
+    |> IO.inspect
+    :ok
   end
 end
