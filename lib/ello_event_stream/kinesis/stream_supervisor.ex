@@ -18,6 +18,7 @@ defmodule Ello.EventStream.Kinesis.StreamSupervisor do
 
   Gets each shard from the stream and starts a ShardSupervisor for each one.
   """
+  @spec start_stream(stream :: String.t, {Module.t, :atom}, Keyword.t) :: [{:ok, pid}]
   def start_stream(stream, callback, opts) do
     stream
     |> Kinesis.shard_ids

@@ -4,6 +4,12 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
     Kinesis,
   }
 
+  @moduledoc """
+  Started by Stream Supervisor, processes events for a given stream's shard.
+
+  Not typically started manually.
+  """
+
   defmodule State do
     defstruct [
       stream:     nil,
@@ -59,7 +65,7 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
   defp rate_limit(%{last_fetch: nil} = state),
     do: %{state | last_fetch: System.system_time(:second)}
   defp rate_limit(%{last_fetch: last_fetch} = state) do
-    if (last_fetch - System.system_time(:second)) < 1 do
+    if (last_fetch - System.system_time(:second)) < rate_limit() do
       :timer.sleep(1000)
     end
     %{state | last_fetch: System.system_time(:second)}
@@ -78,7 +84,6 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
     end
   end
 
-  defp process_events(%{exit: true} = state), do: state
   defp process_events(%{events: []} = state), do: state
   defp process_events(%{events: [event | rest]} = state) do
     Logger.debug "Processing #{event.type} event ##{event.sequence_number}."
@@ -98,7 +103,11 @@ defmodule Ello.EventStream.Kinesis.ShardProcessor do
     %{state | last_sequence_number: sequence_number}
   end
 
-  def kinesis do
-    Application.get_env(:ello_event_stream, :kinesis, Kinesis)
+  defp kinesis do
+    Application.get_env(:ello_event_stream, :kinesis_client, Kinesis)
+  end
+
+  defp rate_limit do
+    Application.get_env(:ello_event_stream, :kinesis_read_request_min_rate, 1)
   end
 end
